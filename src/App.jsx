@@ -142,6 +142,7 @@ function App() {
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
+            <h2>Produtos: {dados.length}</h2>
           </div>
           <h2>INV</h2>
         </div>
