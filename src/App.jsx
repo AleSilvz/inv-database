@@ -19,6 +19,7 @@ function App() {
   const [dados, setDados] = useState([]);
   const [edit, setEdit] = useState(false);
   const [codeProduct, setCodeProduct] = useState("");
+  const [search, setSearch] = useState("");
 
   const hanlderInputText = (text) => {
     const format = text.toUpperCase();
@@ -57,12 +58,11 @@ function App() {
           product: produto,
         });
 
-        setCodigo("");
-        setProduto("");
-
         alert("Produto cadastrado!");
       }
 
+      setCodigo("");
+      setProduto("");
       console.log("Produto:", produto, "Código:", codigo);
     } catch (error) {
       throw error;
@@ -70,7 +70,7 @@ function App() {
   };
 
   const produtosFiltrados = dados.filter((item) =>
-    item.product.includes(produto)
+    String(item.code).includes(search)
   );
 
   async function deleterProduct(product, code) {
@@ -133,7 +133,16 @@ function App() {
     <>
       <div className="container">
         <div className="header">
-          <h2 style={{ fontWeight: "100" }}>Database</h2>
+          <div style={{ flexDirection: "row", display: "flex" }}>
+            <h2 style={{ fontWeight: "100" }}>Database</h2>
+            <input
+              type="number"
+              className="input"
+              placeholder="Código..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
+          </div>
           <h2>INV</h2>
         </div>
 
@@ -212,7 +221,7 @@ function App() {
               </tr>
             </thead>
             <tbody>
-              {dados.map((item, index) => (
+              {arr.map((item, index) => (
                 <tr key={index}>
                   <td>{item.code}</td>
                   <td style={{ justifyContent: "space-between" }}>
