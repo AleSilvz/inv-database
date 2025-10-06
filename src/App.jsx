@@ -20,6 +20,7 @@ function App() {
   const [edit, setEdit] = useState(false);
   const [codeProduct, setCodeProduct] = useState("");
   const [search, setSearch] = useState("");
+  const [tipo, setTipo] = useState("");
 
   const hanlderInputText = (text) => {
     const format = text.toUpperCase();
@@ -33,6 +34,7 @@ function App() {
       const e = itens.docs.map((item) => ({
         product: item.data().product,
         code: item.data().code,
+        type: item.data().type,
       }));
       setDados(e);
       // console.log(e);
@@ -41,8 +43,26 @@ function App() {
     return () => unsubscribe();
   }, []);
 
+  function validation() {
+    const errs = {};
+    if (!codigo) errs.code = "Digite o codigo do Produto!";
+    if (!produto) errs.product = "Digite o nome do Produto!";
+    if (!tipo) errs.type = "Selecione o tipo!";
+
+    if (Object.keys(errs).length > 0) {
+      alert(Object.values(errs).join("\n"));
+      return false;
+    }
+
+    return true;
+  }
+
   const handlerAddProduct = async () => {
     try {
+      const validacao = validation();
+
+      if (!validacao) return;
+
       const docRef = collection(db, "inv");
 
       const q = query(docRef, where("code", "==", codigo));
@@ -56,6 +76,7 @@ function App() {
         await addDoc(docRef, {
           code: codigo,
           product: produto,
+          type: tipo,
         });
 
         alert("Produto cadastrado!");
@@ -63,6 +84,7 @@ function App() {
 
       setCodigo("");
       setProduto("");
+      setTipo("");
       console.log("Produto:", produto, "Código:", codigo);
     } catch (error) {
       throw error;
@@ -84,6 +106,9 @@ function App() {
       const docDelete = doc(db, "inv", id);
       if (confirm(`Deseja excluir ${product}?`)) {
         await deleteDoc(docDelete);
+
+        setSearch("");
+
         return alert("Produto excluido do banco de dados!");
       }
     } catch (error) {
@@ -104,6 +129,10 @@ function App() {
 
   async function alteracao() {
     try {
+      const validacao = validation();
+
+      if (!validacao) return;
+
       const docAll = collection(db, "inv");
       const q = query(docAll, where("code", "==", codeProduct));
 
@@ -115,11 +144,14 @@ function App() {
       await updateDoc(docEdit, {
         code: codigo,
         product: produto,
+        type: tipo,
       });
 
       setProduto("");
       setCodigo("");
       setCodeProduct("");
+      setSearch("");
+      setTipo("");
       setEdit(false);
       alert("Produto editado com sucesso!");
     } catch (error) {
@@ -133,12 +165,19 @@ function App() {
     <>
       <div className="container">
         <div className="header">
-          <div style={{ flexDirection: "row", display: "flex" }}>
+          <div
+            style={{
+              flexDirection: "row",
+              display: "flex",
+              justifyContent: "center",
+              gap: 15,
+            }}
+          >
             <h2 style={{ fontWeight: "100" }}>Database</h2>
             <input
               type="number"
-              className="input"
-              placeholder="Código..."
+              className="input-search"
+              placeholder="Pesquisa..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
@@ -163,6 +202,16 @@ function App() {
               value={produto}
               onChange={(e) => hanlderInputText(e.target.value)}
             />
+            <select
+              name="tipo"
+              id="tipo"
+              value={tipo}
+              onChange={(e) => setTipo(e.target.value)}
+            >
+              <option value="">TIPO</option>
+              <option value="KG">KG</option>
+              <option value="UND">UND</option>
+            </select>
             <button className="button" onClick={handlerAddProduct}>
               <span className="shadow"></span>
               <span className="edge"></span>
@@ -194,6 +243,16 @@ function App() {
               value={produto}
               onChange={(e) => hanlderInputText(e.target.value)}
             />
+            <select
+              name="tipo"
+              id="tipo"
+              value={tipo}
+              onChange={(e) => setTipo(e.target.value)}
+            >
+              <option value="">TIPO</option>
+              <option value="KG">KG</option>
+              <option value="UND">UND</option>
+            </select>
 
             <button className="button" onClick={alteracao}>
               <span className="shadow"></span>
@@ -218,23 +277,24 @@ function App() {
               <tr>
                 <th>codigo</th>
                 <th>produto</th>
+                <th>tipo</th>
+                <th />
                 <th />
               </tr>
             </thead>
             <tbody>
               {arr.map((item, index) => (
-                <tr key={index}>
-                  <td>{item.code}</td>
-                  <td style={{ justifyContent: "space-between" }}>
-                    {item.product}{" "}
-                  </td>
-                  <td
-                    style={{ display: "flex", justifyContent: "space-evenly" }}
-                  >
+                <tr className="tr" key={index}>
+                  <td className="td">{item.code}</td>
+                  <td className="td">{item.product}</td>
+                  <td>{item.type}</td>
+                  <td style={{ justifyContent: "space-evenly" }}>
                     <ion-icon
                       onClick={() => editProduct(item.product, item.code)}
                       name="pencil-outline"
                     />
+                  </td>
+                  <td>
                     <ion-icon
                       onClick={() => deleterProduct(item.product, item.code)}
                       name="trash-outline"
