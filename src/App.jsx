@@ -20,6 +20,7 @@ function App() {
   const [edit, setEdit] = useState(false);
   const [codeProduct, setCodeProduct] = useState("");
   const [search, setSearch] = useState("");
+  const [searchProduct, setSearchProduct] = useState("");
   const [tipo, setTipo] = useState("");
 
   const hanlderInputText = (text) => {
@@ -92,7 +93,9 @@ function App() {
   };
 
   const produtosFiltrados = dados.filter((item) =>
-    String(item.code).includes(search)
+    searchProduct
+      ? String(item.product).includes(searchProduct)
+      : String(item.code).includes(search)
   );
 
   async function deleterProduct(product, code) {
@@ -173,15 +176,23 @@ function App() {
               gap: 15,
             }}
           >
-            <h2 style={{ fontWeight: "100" }}>Database</h2>
+            <div>
+              <h2 className="database">Database</h2>
+              <h2 className="database">Produtos: {dados.length}</h2>
+            </div>
             <input
               type="number"
               className="input-search"
-              placeholder="Pesquisa..."
+              placeholder="Pesquisa codigo..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
-            <h2>Produtos: {dados.length}</h2>
+            <input
+              className="input-search"
+              placeholder="Pesquisa produto..."
+              value={searchProduct}
+              onChange={(e) => setSearchProduct(e.target.value.toLocaleUpperCase())}
+            />
           </div>
           <h2>INV</h2>
         </div>
